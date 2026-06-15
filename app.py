@@ -8,8 +8,11 @@ from dotenv import load_dotenv
 # 加载 .env 文件中的环境变量（本地开发用）
 load_dotenv()
 
-# 获取 API Key：优先 Streamlit Cloud 的 secrets，其次本地 .env 文件
-api_key = st.secrets.get("DEEPSEEK_API_KEY") if hasattr(st, "secrets") else None
+# 获取 API Key：优先 Streamlit Cloud secrets，其次本地 .env 文件
+try:
+    api_key = st.secrets.get("DEEPSEEK_API_KEY")
+except Exception:
+    api_key = None
 if not api_key:
     api_key = os.getenv("DEEPSEEK_API_KEY")
 
