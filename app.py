@@ -610,15 +610,11 @@ elif st.session_state.stage == "choosing":
     if remaining_dim:
         st.session_state.covered_dimensions.append(remaining_dim[0])
 
-    # ===== 把 AI 的问题存入对话历史 =====
-    current_dim_name = remaining_dim[0].split("——")[0] if remaining_dim else ""
-    ai_question_text = f"[{current_dim_name}] {question}"
-    if choices:
-        choice_texts = "；".join([f"{c.get('label','')}: {c.get('value','')}" for c in choices])
-        ai_question_text += f"\n选项：{choice_texts}"
-    st.session_state.messages.append({"role": "assistant", "content": ai_question_text})
+    # ===== 把 AI 原始 JSON 存入对话历史（保持格式，AI 才不会被带偏） =====
+    ai_raw_json = json.dumps(data, ensure_ascii=False, indent=2)
+    st.session_state.messages.append({"role": "assistant", "content": ai_raw_json})
 
-    # ===== 显示对话记录（气泡样式） =====
+    # ===== 显示对话记录（气泡样式 - 从 JSON 渲染可读格式） =====
     with st.expander("📜 查看对话记录", expanded=False):
         chat_html = '<div class="chat-container">'
         for msg in st.session_state.messages:
@@ -627,16 +623,25 @@ elif st.session_state.stage == "choosing":
             role_class = "user" if msg["role"] == "user" else "assistant"
             content = msg["content"]
 
-            # 检测是否有维度标记
-            dim_match = re.match(r'^\[(.+?)\](.*)', content)
-            if dim_match and msg["role"] == "assistant":
-                dim_tag = dim_match.group(1)
-                body = dim_match.group(2).strip()
-                body_html = f'<div class="dimension-tag">{dim_tag}</div>{body}'
-            else:
-                body_html = content
+            # 如果是 assistant 的 JSON 消息，解析出可读文本
+            if msg["role"] == "assistant":
+                try:
+                    json_obj = json.loads(content)
+                    if isinstance(json_obj, dict) and "question" in json_obj:
+                        q = json_obj.get("question", "")
+                        choices_list = json_obj.get("choices", [])
+                        if choices_list:
+                            choice_parts = [f'  · {c.get("label","")}' for c in choices_list]
+                            body_html = f"{q}<br>" + "<br>".join(choice_parts)
+                        else:
+                            body_html = q
+                        chat_html += f'<div class="chat-bubble {role_class}">{body_html}</div>'
+                        continue
+                except (json.JSONDecodeError, TypeError, AttributeError):
+                    pass
 
-            chat_html += f'<div class="chat-bubble {role_class}">{body_html}</div>'
+            # 普通文本消息（用户消息 或 非 JSON 的 assistant 消息）
+            chat_html += f'<div class="chat-bubble {role_class}">{content}</div>'
         chat_html += '</div>'
         st.markdown(chat_html, unsafe_allow_html=True)
 
