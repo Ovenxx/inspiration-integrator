@@ -1,0 +1,12 @@
+2026-06-16 19:48:43.019 No ASGI app assignments found in D:\00000phD\codes\_Inspiration_proj\pythonProject\app.py
+2026-06-16 19:48:43.123 Filtered 59 packages down to 1 candidates for component scanning
+2026-06-16 19:48:43.123 Scanning 1 candidate packages for component manifests using 1 worker threads
+2026-06-16 19:48:43.135 Found 0 component manifests total
+2026-06-16 19:48:43.135 No asset roots to watch
+2026-06-16 19:48:43.135 File watching not started
+2026-06-16 19:48:43.135 Starting new event loop for server
+2026-06-16 19:48:43.136 Starting server...
+2026-06-16 19:48:43.592 Starting uvicorn server on 0.0.0.0:8599
+2026-06-16 19:48:43.632 Runtime state: RuntimeState.INITIAL -> RuntimeState.NO_SESSIONS_CONNECTED
+2026-06-16 19:48:43.633 Uvicorn server started on 0.0.0.0:8599
+2026-06-16 19:48:44.039 Setting up signal handler
