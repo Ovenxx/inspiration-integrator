@@ -314,9 +314,12 @@ def synthesize(角色, 动作, 场景):
 # ───────────────────────────────────────
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap');
-    html, body, [class*="css"] { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-    .stApp { background: #f5f5f0; }
+    html, body, [class*="css"] { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    .stApp { background: #f5f5f0; position: relative; overflow-x: hidden; }
+    .stApp::before, .stApp::after { content: ''; position: fixed; border-radius: 50%; pointer-events: none; z-index: 0; opacity: 0.25; }
+    .stApp::before { width: 500px; height: 500px; background: radial-gradient(circle, rgba(245, 166, 35, 0.06) 0%, transparent 70%); top: -150px; right: -150px; animation: floatGlow 12s ease-in-out infinite alternate; }
+    .stApp::after { width: 400px; height: 400px; background: radial-gradient(circle, rgba(217, 119, 87, 0.06) 0%, transparent 70%); bottom: -100px; left: -100px; animation: floatGlow 15s ease-in-out infinite alternate-reverse; }
+    @keyframes floatGlow { 0% { transform: translate(0, 0) scale(1); opacity: 0.2; } 100% { transform: translate(30px, -20px) scale(1.15); opacity: 0.35; } }
     .main .block-container { max-width: 800px; padding-top: 2rem; padding-bottom: 4rem; }
     .app-header { text-align: center; padding-bottom: 2rem; margin-bottom: 1.5rem; border-bottom: 1px solid #e5e5e0; }
     .app-header h1 { font-size: 1.75rem; font-weight: 600; letter-spacing: -0.02em; color: #1a1a1a; margin-bottom: 0.25rem; }
@@ -388,28 +391,35 @@ st.markdown("""
         letter-spacing: 0.05em; margin-bottom: 0.5rem;
     }
     .element-card {
-        width: 100%; padding: 1.1rem 0.75rem; border-radius: 14px;
-        background: #ffffff; border: 2px solid #e5e5e0; text-align: center;
+        width: 100%; padding: 1.1rem 0.75rem; border-radius: 16px;
+        background: #ffffff; border: 2px solid #ecece5; text-align: center;
         font-size: 0.95rem; font-weight: 500; color: #1a1a1a; line-height: 1.4;
         min-height: 72px; display: flex; align-items: center; justify-content: center;
-        transition: all 0.2s ease; cursor: pointer; position: relative;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        position: relative;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02);
     }
-    .element-card:hover { border-color: #d0d0cb; transform: translateY(-1px); }
-    .element-card.flipping { animation: flipIn 0.3s ease; }
+    .element-card:hover { border-color: #d0d0cb; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.07); }
+    .element-card.flipping { animation: cardFlip 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
     .element-card.locked {
-        border-color: #d97757; background: #fdf6f3;
-        box-shadow: 0 0 0 3px rgba(217, 119, 87, 0.10);
+        border-color: #d97757; background: linear-gradient(135deg, #fdf6f3 0%, #fff8f0 100%);
+        box-shadow: 0 0 0 3px rgba(217, 119, 87, 0.12), 0 4px 14px rgba(217, 119, 87, 0.08);
     }
     .element-card .lock-badge {
-        position: absolute; top: -6px; right: -6px; font-size: 0.7rem;
-        background: #d97757; color: white; width: 20px; height: 20px;
+        position: absolute; top: -7px; right: -7px; font-size: 0.65rem;
+        background: #d97757; color: white; width: 22px; height: 22px;
         border-radius: 50%; display: flex; align-items: center; justify-content: center;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+        box-shadow: 0 2px 6px rgba(217, 119, 87, 0.3);
+        animation: lockPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-    @keyframes flipIn {
-        0% { transform: rotateX(10deg) scale(0.95); opacity: 0.5; }
+    @keyframes cardFlip {
+        0% { transform: rotateX(-8deg) scale(0.92); opacity: 0.3; }
         100% { transform: rotateX(0) scale(1); opacity: 1; }
+    }
+    @keyframes lockPop {
+        0% { transform: scale(0); }
+        70% { transform: scale(1.25); }
+        100% { transform: scale(1); }
     }
 
     .book-actions {
@@ -422,10 +432,19 @@ st.markdown("""
         max-width: 680px; margin: 1.25rem auto 0 auto;
         padding: 1rem 1.25rem; background: linear-gradient(135deg, #fdf6f3, #fff8f0);
         border-radius: 14px; border: 1.5px solid #f0e0d8;
-        text-align: center;
+        text-align: center; position: relative; overflow: hidden;
     }
-    .inspiration-preview .label { font-size: 0.75rem; color: #d97757; font-weight: 600; letter-spacing: 0.03em; margin-bottom: 0.3rem; }
-    .inspiration-preview .sentence { font-size: 1rem; font-weight: 500; color: #1a1a1a; line-height: 1.5; }
+    .inspiration-preview::before {
+        content: ''; position: absolute; inset: 0;
+        background: linear-gradient(90deg, transparent, rgba(217,119,87,0.03), transparent);
+        animation: shimmer 2.5s ease-in-out infinite;
+    }
+    @keyframes shimmer {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+    }
+    .inspiration-preview .label { font-size: 0.75rem; color: #d97757; font-weight: 600; letter-spacing: 0.03em; margin-bottom: 0.3rem; position: relative; z-index: 1; }
+    .inspiration-preview .sentence { font-size: 1rem; font-weight: 500; color: #1a1a1a; line-height: 1.5; position: relative; z-index: 1; }
 
     /* ─── 聊天气泡 ─── */
     .chat-container { display: flex; flex-direction: column; gap: 0.75rem; margin: 1rem 0; }
@@ -440,9 +459,9 @@ st.markdown("""
     div[data-testid="stForm"] .stTextInput > div > div > input { border-radius: 8px; padding: 0.6rem 0.85rem; font-size: 0.9rem; }
 
     /* ─── 按钮 ─── */
-    div.stButton button { border-radius: 100px !important; border: 1.5px solid #e0e0db !important; background: #ffffff !important; color: #1a1a1a !important; font-size: 0.9rem !important; font-weight: 500 !important; padding: 0.6rem 1.25rem !important; width: 100%; transition: all 0.15s ease; box-shadow: none !important; }
-    div.stButton button:hover { border-color: #d97757 !important; background: #fdf6f3 !important; color: #d97757 !important; box-shadow: 0 2px 8px rgba(217, 119, 87, 0.10) !important; }
-    div.stButton button:active { transform: scale(0.97); }
+    div.stButton button { border-radius: 100px !important; border: 1.5px solid #e0e0db !important; background: #ffffff !important; color: #1a1a1a !important; font-size: 0.9rem !important; font-weight: 500 !important; padding: 0.6rem 1.25rem !important; width: 100%; transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important; }
+    div.stButton button:hover { border-color: #d97757 !important; background: #fdf6f3 !important; color: #d97757 !important; box-shadow: 0 4px 12px rgba(217, 119, 87, 0.10) !important; transform: translateY(-1px); }
+    div.stButton button:active { transform: scale(0.96) !important; }
 
     /* ─── 进度 ─── */
     .stProgress > div > div > div > div { background: linear-gradient(90deg, #d97757, #f5a623); border-radius: 100px; }
