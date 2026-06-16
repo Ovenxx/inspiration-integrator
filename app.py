@@ -312,63 +312,158 @@ def synthesize(角色, 动作, 场景):
 # ───────────────────────────────────────
 # 页面样式
 # ───────────────────────────────────────
-st.markdown("""<style>
-html, body, [class*="css"] { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-.stApp { background: #f5f5f0; position: relative; overflow-x: hidden; }
-.stApp::before, .stApp::after { content: ''; position: fixed; border-radius: 50%; pointer-events: none; z-index: 0; opacity: 0.30; }
-.stApp::before { width: 500px; height: 500px; background: radial-gradient(circle, rgba(245, 166, 35, 0.08) 0%, transparent 70%); top: -150px; right: -150px; animation: floatGlow 12s ease-in-out infinite alternate; }
-.stApp::after { width: 400px; height: 400px; background: radial-gradient(circle, rgba(217, 119, 87, 0.08) 0%, transparent 70%); bottom: -100px; left: -100px; animation: floatGlow 15s ease-in-out infinite alternate-reverse; }
-@keyframes floatGlow { 0% { transform: translate(0, 0) scale(1); opacity: 0.25; } 100% { transform: translate(30px, -20px) scale(1.15); opacity: 0.40; } }
-.main .block-container { max-width: 800px; padding-top: 2rem; padding-bottom: 4rem; position: relative; z-index: 1; }
-.app-header { text-align: center; padding-bottom: 2rem; margin-bottom: 1.5rem; border-bottom: 1px solid #e5e5e0; }
-.app-header h1 { font-size: 1.75rem; font-weight: 600; letter-spacing: -0.02em; color: #1a1a1a; margin-bottom: 0.25rem; }
-.app-header .accent-line { width: 48px; height: 3px; background: linear-gradient(90deg, #d97757, #f5a623); border-radius: 2px; margin: 0.75rem auto; }
-.app-header .subtitle { font-size: 0.9rem; color: #6b6b6b; font-weight: 400; }
-.home-tagline { text-align: center; color: #6b6b6b; font-size: 0.95rem; line-height: 1.6; max-width: 520px; margin: 0 auto 1.5rem auto; }
-.mode-card-wrapper { padding: 1.5rem 1rem; border-radius: 18px; text-align: center; border: 2px solid #e5e5e0; background: #ffffff; box-shadow: 0 4px 12px rgba(0,0,0,0.04); position: relative; overflow: hidden; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
-.mode-card-wrapper:hover { transform: translateY(-4px) scale(1.01); box-shadow: 0 12px 32px rgba(0,0,0,0.08); border-color: #d0d0cb; }
-.mode-card-wrapper:active { transform: translateY(-1px) scale(0.99); }
-.mode-card-wrapper .icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
-.mode-card-wrapper .title { font-size: 1.2rem; font-weight: 600; color: #1a1a1a; margin-bottom: 0.4rem; }
-.mode-card-wrapper .desc { font-size: 0.85rem; color: #8b8b8b; line-height: 1.5; }
-.playground-header { text-align: center; margin-bottom: 1.5rem; }
-.playground-header h2 { font-size: 1.4rem; font-weight: 600; color: #1a1a1a; margin-bottom: 0.25rem; }
-.playground-header p { font-size: 0.85rem; color: #8b8b8b; }
-.book-header { text-align: center; margin: 1.5rem 0 1.25rem 0; }
-.book-header h2 { font-size: 1.3rem; font-weight: 600; color: #1a1a1a; }
-.book-header .book-subtitle { font-size: 0.8rem; color: #8b8b8b; margin-top: 0.2rem; }
-.book-header .book-divider { width: 32px; height: 2px; border-radius: 1px; margin: 0.6rem auto; }
-.element-card { width: 100%; padding: 1.25rem 0.65rem; border-radius: 16px; background: #ffffff; border: 2px solid #ecece5; text-align: center; font-size: 0.92rem; font-weight: 500; color: #1a1a1a; line-height: 1.4; min-height: 80px; display: flex; align-items: center; justify-content: center; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); position: relative; box-shadow: 0 3px 10px rgba(0,0,0,0.04); }
-.element-card:hover { border-color: #d0d0cb; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.07); }
-.element-card.locked { border-color: #d97757; background: linear-gradient(135deg, #fdf6f3 0%, #fff8f0 100%); box-shadow: 0 0 0 3px rgba(217, 119, 87, 0.12); }
-.element-card .lock-badge { position: absolute; top: -7px; right: -7px; font-size: 0.65rem; background: #d97757; color: white; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(217, 119, 87, 0.3); }
-@keyframes cardFlip { 0% { transform: rotateX(-8deg) scale(0.92); opacity: 0.3; } 100% { transform: rotateX(0) scale(1); opacity: 1; } }
-.inspiration-preview { max-width: 680px; margin: 1.25rem auto 0 auto; padding: 1rem 1.25rem; background: linear-gradient(135deg, #fdf6f3, #fff8f0); border-radius: 14px; border: 1.5px solid #f0e0d8; text-align: center; }
-.inspiration-preview .label { font-size: 0.75rem; color: #d97757; font-weight: 600; letter-spacing: 0.03em; margin-bottom: 0.3rem; }
-.inspiration-preview .sentence { font-size: 1rem; font-weight: 500; color: #1a1a1a; line-height: 1.5; }
-.chat-container { display: flex; flex-direction: column; gap: 0.75rem; margin: 1rem 0; }
-.chat-bubble { max-width: 88%; padding: 0.75rem 1rem; border-radius: 14px; font-size: 0.92rem; line-height: 1.55; word-break: break-word; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
-.chat-bubble.user { align-self: flex-end; background: #1a1a1a; color: #f5f5f0; border-bottom-right-radius: 4px; }
-.chat-bubble.assistant { align-self: flex-start; background: #ffffff; color: #1a1a1a; border: 1px solid #e5e5e0; border-bottom-left-radius: 4px; }
-.stTextInput > label { display: none !important; }
-.stTextInput > div > div > input { border: 1px solid #e0e0db; border-radius: 12px; padding: 0.75rem 1rem; font-size: 0.95rem; background: #ffffff; transition: border-color 0.2s, box-shadow 0.2s; }
-.stTextInput > div > div > input:focus { border-color: #d97757; box-shadow: 0 0 0 3px rgba(217, 119, 87, 0.12); }
-div.stButton button { border-radius: 100px !important; border: 1.5px solid #e0e0db !important; background: #ffffff !important; color: #1a1a1a !important; font-size: 0.9rem !important; font-weight: 500 !important; padding: 0.6rem 1.25rem !important; width: 100%; transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important; box-shadow: 0 1px 3px rgba(0,0,0,0.02) !important; }
-div.stButton button:hover { border-color: #d97757 !important; background: #fdf6f3 !important; color: #d97757 !important; box-shadow: 0 4px 12px rgba(217, 119, 87, 0.10) !important; transform: translateY(-1px); }
-.stProgress > div > div > div > div { background: linear-gradient(90deg, #d97757, #f5a623); border-radius: 100px; }
-.stProgress > div > div { background: #e5e5e0; border-radius: 100px; height: 6px; }
-.question-header { font-size: 1.15rem; font-weight: 600; color: #1a1a1a; line-height: 1.5; margin: 1.25rem 0 0.75rem 0; padding: 1rem 1.25rem; background: #ffffff; border-radius: 12px; border: 1px solid #e5e5e0; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-.result-card { background: #ffffff; border: 1px solid #e5e5e0; border-radius: 16px; padding: 1.5rem 1.75rem; margin: 1rem 0; box-shadow: 0 4px 16px rgba(0,0,0,0.04); line-height: 1.8; font-size: 0.95rem; color: #2a2a2a; }
-.stage-tag { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.78rem; font-weight: 500; color: #d97757; background: #fdf6f3; padding: 0.25rem 0.7rem; border-radius: 100px; margin-top: 1rem; }
-.stAlert { border-radius: 10px; }
-#MainMenu { visibility: hidden; }
-footer { visibility: hidden; }
-.dim-pills { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.5rem 0; }
-.dim-pill { font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 100px; border: 1px solid #e5e5e0; background: #ffffff; color: #6b6b6b; }
-.dim-pill.active { border-color: #d97757; background: #fdf6f3; color: #d97757; }
-.dim-pill.done { border-color: #b8d4b8; background: #f0f7f0; color: #4a8a4a; }
-.ride-color-bar { height: 3px; border-radius: 2px; margin: 0.5rem auto; width: 40px; }
-</style>""", unsafe_allow_html=True)
+st.markdown("""
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap');
+    html, body, [class*="css"] { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    .stApp { background: #f5f5f0; }
+    .main .block-container { max-width: 800px; padding-top: 2rem; padding-bottom: 4rem; }
+    .app-header { text-align: center; padding-bottom: 2rem; margin-bottom: 1.5rem; border-bottom: 1px solid #e5e5e0; }
+    .app-header h1 { font-size: 1.75rem; font-weight: 600; letter-spacing: -0.02em; color: #1a1a1a; margin-bottom: 0.25rem; }
+    .app-header .accent-line { width: 48px; height: 3px; background: linear-gradient(90deg, #d97757, #f5a623); border-radius: 2px; margin: 0.75rem auto; }
+    .app-header .subtitle { font-size: 0.9rem; color: #6b6b6b; font-weight: 400; }
+
+    /* ─── 双模式入口 ─── */
+    .mode-grid { display: flex; gap: 1.25rem; margin: 2rem auto; max-width: 640px; }
+    .mode-card {
+        flex: 1; padding: 2rem 1.5rem; border-radius: 18px; text-align: center;
+        cursor: pointer; transition: all 0.2s ease; border: 2px solid #e5e5e0;
+        background: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .mode-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    .mode-card .icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+    .mode-card .title { font-size: 1.2rem; font-weight: 600; color: #1a1a1a; margin-bottom: 0.4rem; }
+    .mode-card .desc { font-size: 0.85rem; color: #8b8b8b; line-height: 1.5; }
+    .mode-card.active { border-color: #d97757; background: #fdf6f3; }
+    .mode-card.active .title { color: #d97757; }
+
+    /* ─── 入口描述区 ─── */
+    .home-tagline {
+        text-align: center; color: #6b6b6b; font-size: 0.95rem; line-height: 1.6;
+        max-width: 520px; margin: 0 auto 1.5rem auto;
+    }
+
+    /* ─── 游乐园 - 项目选择 ─── */
+    .playground-header {
+        text-align: center; margin-bottom: 1.5rem;
+    }
+    .playground-header h2 { font-size: 1.4rem; font-weight: 600; color: #1a1a1a; margin-bottom: 0.25rem; }
+    .playground-header p { font-size: 0.85rem; color: #8b8b8b; }
+
+    .ride-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; max-width: 680px; margin: 0 auto; }
+    .ride-card {
+        display: flex; align-items: center; gap: 0.85rem;
+        padding: 1rem 1.1rem; border-radius: 14px; background: #ffffff;
+        border: 1.5px solid #e5e5e0; cursor: pointer; transition: all 0.15s ease;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+    }
+    .ride-card:hover {
+        transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        border-color: #d0d0cb;
+    }
+    .ride-card .ride-emoji { font-size: 2.2rem; flex-shrink: 0; }
+    .ride-card .ride-info { flex: 1; min-width: 0; }
+    .ride-card .ride-name { font-size: 1rem; font-weight: 600; color: #1a1a1a; }
+    .ride-card .ride-vibe { font-size: 0.75rem; color: #8b8b8b; margin-top: 0.1rem; }
+    .ride-card .ride-desc { font-size: 0.78rem; color: #6b6b6b; margin-top: 0.2rem; line-height: 1.3; }
+
+    /* ─── 翻书页 ─── */
+    .book-header {
+        text-align: center; margin-bottom: 1.5rem;
+    }
+    .book-header h2 { font-size: 1.3rem; font-weight: 600; color: #1a1a1a; }
+    .book-header p { font-size: 0.85rem; color: #8b8b8b; margin-top: 0.15rem; }
+    .book-header .back-link {
+        display: inline-block; font-size: 0.8rem; color: #d97757;
+        cursor: pointer; margin-top: 0.3rem;
+    }
+
+    .element-grid {
+        display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.85rem;
+        max-width: 680px; margin: 0 auto;
+    }
+    .element-column { display: flex; flex-direction: column; align-items: center; }
+    .element-column .category-label {
+        font-size: 0.75rem; font-weight: 600; color: #8b8b8b; text-transform: uppercase;
+        letter-spacing: 0.05em; margin-bottom: 0.5rem;
+    }
+    .element-card {
+        width: 100%; padding: 1.1rem 0.75rem; border-radius: 14px;
+        background: #ffffff; border: 2px solid #e5e5e0; text-align: center;
+        font-size: 0.95rem; font-weight: 500; color: #1a1a1a; line-height: 1.4;
+        min-height: 72px; display: flex; align-items: center; justify-content: center;
+        transition: all 0.2s ease; cursor: pointer; position: relative;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+    .element-card:hover { border-color: #d0d0cb; transform: translateY(-1px); }
+    .element-card.flipping { animation: flipIn 0.3s ease; }
+    .element-card.locked {
+        border-color: #d97757; background: #fdf6f3;
+        box-shadow: 0 0 0 3px rgba(217, 119, 87, 0.10);
+    }
+    .element-card .lock-badge {
+        position: absolute; top: -6px; right: -6px; font-size: 0.7rem;
+        background: #d97757; color: white; width: 20px; height: 20px;
+        border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    }
+    @keyframes flipIn {
+        0% { transform: rotateX(10deg) scale(0.95); opacity: 0.5; }
+        100% { transform: rotateX(0) scale(1); opacity: 1; }
+    }
+
+    .book-actions {
+        display: flex; justify-content: center; gap: 0.75rem;
+        margin: 1.5rem auto; max-width: 400px;
+    }
+
+    /* ─── 灵感预览条 ─── */
+    .inspiration-preview {
+        max-width: 680px; margin: 1.25rem auto 0 auto;
+        padding: 1rem 1.25rem; background: linear-gradient(135deg, #fdf6f3, #fff8f0);
+        border-radius: 14px; border: 1.5px solid #f0e0d8;
+        text-align: center;
+    }
+    .inspiration-preview .label { font-size: 0.75rem; color: #d97757; font-weight: 600; letter-spacing: 0.03em; margin-bottom: 0.3rem; }
+    .inspiration-preview .sentence { font-size: 1rem; font-weight: 500; color: #1a1a1a; line-height: 1.5; }
+
+    /* ─── 聊天气泡 ─── */
+    .chat-container { display: flex; flex-direction: column; gap: 0.75rem; margin: 1rem 0; }
+    .chat-bubble { max-width: 88%; padding: 0.75rem 1rem; border-radius: 14px; font-size: 0.92rem; line-height: 1.55; word-break: break-word; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+    .chat-bubble.user { align-self: flex-end; background: #1a1a1a; color: #f5f5f0; border-bottom-right-radius: 4px; }
+    .chat-bubble.assistant { align-self: flex-start; background: #ffffff; color: #1a1a1a; border: 1px solid #e5e5e0; border-bottom-left-radius: 4px; }
+
+    /* ─── 输入框 ─── */
+    .stTextInput > label { display: none !important; }
+    .stTextInput > div > div > input { border: 1px solid #e0e0db; border-radius: 10px; padding: 0.75rem 1rem; font-size: 0.95rem; background: #ffffff; transition: border-color 0.2s, box-shadow 0.2s; }
+    .stTextInput > div > div > input:focus { border-color: #d97757; box-shadow: 0 0 0 3px rgba(217, 119, 87, 0.12); }
+    div[data-testid="stForm"] .stTextInput > div > div > input { border-radius: 8px; padding: 0.6rem 0.85rem; font-size: 0.9rem; }
+
+    /* ─── 按钮 ─── */
+    div.stButton button { border-radius: 100px !important; border: 1.5px solid #e0e0db !important; background: #ffffff !important; color: #1a1a1a !important; font-size: 0.9rem !important; font-weight: 500 !important; padding: 0.6rem 1.25rem !important; width: 100%; transition: all 0.15s ease; box-shadow: none !important; }
+    div.stButton button:hover { border-color: #d97757 !important; background: #fdf6f3 !important; color: #d97757 !important; box-shadow: 0 2px 8px rgba(217, 119, 87, 0.10) !important; }
+    div.stButton button:active { transform: scale(0.97); }
+
+    /* ─── 进度 ─── */
+    .stProgress > div > div > div > div { background: linear-gradient(90deg, #d97757, #f5a623); border-radius: 100px; }
+    .stProgress > div > div { background: #e5e5e0; border-radius: 100px; height: 6px; }
+    .question-header { font-size: 1.15rem; font-weight: 600; color: #1a1a1a; line-height: 1.5; margin: 1.25rem 0 0.75rem 0; padding: 1rem 1.25rem; background: #ffffff; border-radius: 12px; border: 1px solid #e5e5e0; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+    .stSpinner > div { color: #d97757 !important; }
+    .streamlit-expanderHeader { font-size: 0.85rem; color: #6b6b6b; font-weight: 500; border-radius: 8px; }
+    .result-card { background: #ffffff; border: 1px solid #e5e5e0; border-radius: 14px; padding: 1.5rem 1.75rem; margin: 1rem 0; box-shadow: 0 2px 8px rgba(0,0,0,0.04); line-height: 1.8; font-size: 0.95rem; color: #2a2a2a; }
+    .stage-tag { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.78rem; font-weight: 500; color: #d97757; background: #fdf6f3; padding: 0.25rem 0.7rem; border-radius: 100px; margin-top: 1rem; }
+    .stAlert { border-radius: 10px; }
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    .dim-pills { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.5rem 0; }
+    .dim-pill { font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 100px; border: 1px solid #e5e5e0; background: #ffffff; color: #6b6b6b; }
+    .dim-pill.active { border-color: #d97757; background: #fdf6f3; color: #d97757; }
+    .dim-pill.done { border-color: #b8d4b8; background: #f0f7f0; color: #4a8a4a; }
+
+    /* rides header color accent */
+    .ride-color-bar { height: 3px; border-radius: 2px; margin: 0.5rem auto; width: 40px; }
+</style>
+""", unsafe_allow_html=True)
 
 # ===== 初始化状态 =====
 if "messages" not in st.session_state:
@@ -412,7 +507,7 @@ if st.session_state.stage == "home":
     col1, col2 = st.columns(2)
     with col1:
         st.markdown("""
-        <div class="mode-card-wrapper">
+        <div class="mode-card" id="mode-hasidea">
             <div class="icon">✍️</div>
             <div class="title">我有想法</div>
             <div class="desc">脑海里已经有画面的雏形了<br>让 AI 帮你打磨成完整提示词</div>
@@ -424,7 +519,7 @@ if st.session_state.stage == "home":
 
     with col2:
         st.markdown("""
-        <div class="mode-card-wrapper">
+        <div class="mode-card" id="mode-playground">
             <div class="icon">🎪</div>
             <div class="title">来找灵感</div>
             <div class="desc">没有想法，随便玩玩<br>让灵感自己来找你</div>
@@ -475,6 +570,8 @@ elif st.session_state.stage == "playground":
         cols = st.columns(2)
         for col_idx, ride in enumerate(row_rides):
             with cols[col_idx]:
+                btn_label = f"{ride['emoji']}  {ride['name']}\n{ride['vibe']}\n{ride['desc']}"
+                # 每个项目按钮显示 emoji + 名称 + 风格
                 if st.button(
                     f"{ride['emoji']}  {ride['name']}",
                     key=f"ride_{ride['id']}",
@@ -487,6 +584,7 @@ elif st.session_state.stage == "playground":
                     st.session_state.current_elements = elems
                     st.session_state.stage = "ride_play"
                     st.rerun()
+                # 子描述文字
                 st.caption(f"{ride['vibe']} · {ride['desc']}")
 
 # ══════════════════════════════════════
@@ -505,12 +603,13 @@ elif st.session_state.stage == "ride_play":
     locked = st.session_state.get("locked_elements", {})
     categories = ["角色", "动作", "场景"]
 
+    # 书头
     st.markdown(f"""
     <div class="book-header">
         <h2>{ride['emoji']} {ride['name']}</h2>
-        <div class="book-subtitle" style="color:{ride['color']}">{ride['vibe']}</div>
-        <div class="book-divider" style="background:{ride['color']}"></div>
-        <div class="book-subtitle">点击 🔒 锁定喜欢的元素，再翻页就不会变了</div>
+        <p style="color:{ride['color']}">{ride['vibe']}</p>
+        <div class="ride-color-bar" style="background:{ride['color']}"></div>
+        <p style="font-size:0.85rem; color:#8b8b8b;">点击元素卡片锁定它，再翻页就不会变了</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -526,8 +625,7 @@ elif st.session_state.stage == "ride_play":
             flip_class = " flipping" if st.session_state.get("_just_flipped", False) else ""
             st.markdown(
                 f'<div class="element-card {lock_class}{flip_class}" id="card_{cat}">'
-                f'{lock_badge}<span>{val}</span>'
-                f'<div class="flip-arrow">⟳</div></div>',
+                f'{lock_badge}<span>{val}</span></div>',
                 unsafe_allow_html=True
             )
             # 锁定/解锁小按钮
