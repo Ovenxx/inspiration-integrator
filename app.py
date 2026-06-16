@@ -316,26 +316,80 @@ st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap');
     html, body, [class*="css"] { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-    .stApp { background: #f5f5f0; }
-    .main .block-container { max-width: 800px; padding-top: 2rem; padding-bottom: 4rem; }
-    .app-header { text-align: center; padding-bottom: 2rem; margin-bottom: 1.5rem; border-bottom: 1px solid #e5e5e0; }
-    .app-header h1 { font-size: 1.75rem; font-weight: 600; letter-spacing: -0.02em; color: #1a1a1a; margin-bottom: 0.25rem; }
-    .app-header .accent-line { width: 48px; height: 3px; background: linear-gradient(90deg, #d97757, #f5a623); border-radius: 2px; margin: 0.75rem auto; }
+
+    /* ─── 背景层 ─── */
+    .stApp {
+        background: #f5f5f0;
+        position: relative;
+        overflow-x: hidden;
+    }
+    /* 氛围装饰：浮动光晕 */
+    .stApp::before, .stApp::after {
+        content: '';
+        position: fixed;
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 0;
+        opacity: 0.30;
+    }
+    .stApp::before {
+        width: 500px; height: 500px;
+        background: radial-gradient(circle, #f5a62315 0%, transparent 70%);
+        top: -150px; right: -150px;
+        animation: floatGlow 12s ease-in-out infinite alternate;
+    }
+    .stApp::after {
+        width: 400px; height: 400px;
+        background: radial-gradient(circle, #d9775715 0%, transparent 70%);
+        bottom: -100px; left: -100px;
+        animation: floatGlow 15s ease-in-out infinite alternate-reverse;
+    }
+    @keyframes floatGlow {
+        0% { transform: translate(0, 0) scale(1); opacity: 0.25; }
+        100% { transform: translate(30px, -20px) scale(1.15); opacity: 0.40; }
+    }
+
+    .main .block-container {
+        max-width: 800px; padding-top: 2rem; padding-bottom: 4rem;
+        position: relative; z-index: 1;
+    }
+
+    /* ─── 标题区 ─── */
+    .app-header {
+        text-align: center; padding-bottom: 2rem; margin-bottom: 1.5rem;
+        border-bottom: 1px solid #e5e5e0;
+    }
+    .app-header h1 {
+        font-size: 1.75rem; font-weight: 600; letter-spacing: -0.02em;
+        color: #1a1a1a; margin-bottom: 0.25rem;
+    }
+    .app-header .accent-line {
+        width: 48px; height: 3px;
+        background: linear-gradient(90deg, #d97757, #f5a623);
+        border-radius: 2px; margin: 0.75rem auto;
+    }
     .app-header .subtitle { font-size: 0.9rem; color: #6b6b6b; font-weight: 400; }
 
     /* ─── 双模式入口 ─── */
     .mode-grid { display: flex; gap: 1.25rem; margin: 2rem auto; max-width: 640px; }
     .mode-card {
         flex: 1; padding: 2rem 1.5rem; border-radius: 18px; text-align: center;
-        cursor: pointer; transition: all 0.2s ease; border: 2px solid #e5e5e0;
-        background: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        cursor: pointer; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        border: 2px solid #e5e5e0; background: #ffffff;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02);
+        position: relative; overflow: hidden;
     }
-    .mode-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
-    .mode-card .icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
-    .mode-card .title { font-size: 1.2rem; font-weight: 600; color: #1a1a1a; margin-bottom: 0.4rem; }
-    .mode-card .desc { font-size: 0.85rem; color: #8b8b8b; line-height: 1.5; }
-    .mode-card.active { border-color: #d97757; background: #fdf6f3; }
-    .mode-card.active .title { color: #d97757; }
+    .mode-card::after {
+        content: ''; position: absolute; inset: 0;
+        background: linear-gradient(135deg, transparent 60%, #fdf6f360 100%);
+        opacity: 0; transition: opacity 0.3s ease;
+    }
+    .mode-card:hover { transform: translateY(-4px) scale(1.01); box-shadow: 0 12px 32px rgba(0,0,0,0.08); border-color: #d0d0cb; }
+    .mode-card:hover::after { opacity: 1; }
+    .mode-card:active { transform: translateY(-1px) scale(0.99); }
+    .mode-card .icon { font-size: 2.5rem; margin-bottom: 0.75rem; display: block; position: relative; z-index: 1; }
+    .mode-card .title { font-size: 1.2rem; font-weight: 600; color: #1a1a1a; margin-bottom: 0.4rem; position: relative; z-index: 1; }
+    .mode-card .desc { font-size: 0.85rem; color: #8b8b8b; line-height: 1.5; position: relative; z-index: 1; }
 
     /* ─── 入口描述区 ─── */
     .home-tagline {
@@ -344,88 +398,162 @@ st.markdown("""
     }
 
     /* ─── 游乐园 - 项目选择 ─── */
-    .playground-header {
-        text-align: center; margin-bottom: 1.5rem;
-    }
+    .playground-header { text-align: center; margin-bottom: 1.5rem; }
     .playground-header h2 { font-size: 1.4rem; font-weight: 600; color: #1a1a1a; margin-bottom: 0.25rem; }
     .playground-header p { font-size: 0.85rem; color: #8b8b8b; }
 
-    .ride-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; max-width: 680px; margin: 0 auto; }
-    .ride-card {
-        display: flex; align-items: center; gap: 0.85rem;
-        padding: 1rem 1.1rem; border-radius: 14px; background: #ffffff;
-        border: 1.5px solid #e5e5e0; cursor: pointer; transition: all 0.15s ease;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+    /* 项目按钮的专属样式（覆盖全局按钮） */
+    .ride-btn button {
+        border-radius: 16px !important;
+        border: 1.5px solid #e5e5e0 !important;
+        background: #ffffff !important;
+        color: #1a1a1a !important;
+        font-size: 1.05rem !important;
+        font-weight: 600 !important;
+        padding: 1rem 1.25rem !important;
+        text-align: left !important;
+        transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02) !important;
+        position: relative !important;
+        overflow: hidden !important;
     }
-    .ride-card:hover {
-        transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-        border-color: #d0d0cb;
+    .ride-btn button::before {
+        content: ''; position: absolute; inset: 0;
+        background: linear-gradient(135deg, transparent 50%, #fdf6f360 100%);
+        opacity: 0; transition: opacity 0.3s ease;
     }
-    .ride-card .ride-emoji { font-size: 2.2rem; flex-shrink: 0; }
-    .ride-card .ride-info { flex: 1; min-width: 0; }
-    .ride-card .ride-name { font-size: 1rem; font-weight: 600; color: #1a1a1a; }
-    .ride-card .ride-vibe { font-size: 0.75rem; color: #8b8b8b; margin-top: 0.1rem; }
-    .ride-card .ride-desc { font-size: 0.78rem; color: #6b6b6b; margin-top: 0.2rem; line-height: 1.3; }
+    .ride-btn button:hover {
+        transform: translateY(-3px) scale(1.01) !important;
+        box-shadow: 0 12px 28px rgba(0,0,0,0.08) !important;
+        border-color: #d0d0cb !important;
+    }
+    .ride-btn button:hover::before { opacity: 1; }
+    .ride-btn button:active { transform: translateY(-1px) scale(0.98) !important; }
+
+    /* 按钮下方 caption 缩进 */
+    .ride-caption {
+        display: block;
+        padding-left: 0.25rem;
+        margin-top: -0.25rem;
+        margin-bottom: 0.75rem;
+    }
 
     /* ─── 翻书页 ─── */
-    .book-header {
-        text-align: center; margin-bottom: 1.5rem;
+    .book-container {
+        background: linear-gradient(180deg, #fafaf7 0%, #f5f5f0 100%);
+        border-radius: 24px;
+        padding: 1.5rem 1.25rem 2rem 1.25rem;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.8), 0 4px 20px rgba(0,0,0,0.04);
+        position: relative;
     }
-    .book-header h2 { font-size: 1.3rem; font-weight: 600; color: #1a1a1a; }
-    .book-header p { font-size: 0.85rem; color: #8b8b8b; margin-top: 0.15rem; }
-    .book-header .back-link {
-        display: inline-block; font-size: 0.8rem; color: #d97757;
-        cursor: pointer; margin-top: 0.3rem;
+    .book-container::before {
+        content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+        width: 60%; height: 2px;
+        background: linear-gradient(90deg, transparent, #e0d5c8, transparent);
     }
 
-    .element-grid {
-        display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.85rem;
-        max-width: 680px; margin: 0 auto;
+    .book-header { text-align: center; margin-bottom: 1.25rem; }
+    .book-header h2 { font-size: 1.3rem; font-weight: 600; color: #1a1a1a; }
+    .book-header .book-subtitle { font-size: 0.8rem; color: #8b8b8b; margin-top: 0.2rem; }
+    .book-header .book-divider { width: 32px; height: 2px; border-radius: 1px; margin: 0.6rem auto; }
+
+    /* 翻书装饰 - 书角 */
+    .book-corner {
+        position: absolute; width: 20px; height: 20px;
+        border: 2px solid #e5e5e0; border-radius: 4px;
     }
+    .book-corner.tl { top: -1px; left: -1px; border-right: none; border-bottom: none; border-top-left-radius: 24px; }
+    .book-corner.tr { top: -1px; right: -1px; border-left: none; border-bottom: none; border-top-right-radius: 24px; }
+    .book-corner.bl { bottom: -1px; left: -1px; border-right: none; border-top: none; border-bottom-left-radius: 24px; }
+    .book-corner.br { bottom: -1px; right: -1px; border-left: none; border-top: none; border-bottom-right-radius: 24px; }
+
+    .element-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.85rem; max-width: 100%; margin: 0 auto; }
     .element-column { display: flex; flex-direction: column; align-items: center; }
     .element-column .category-label {
-        font-size: 0.75rem; font-weight: 600; color: #8b8b8b; text-transform: uppercase;
-        letter-spacing: 0.05em; margin-bottom: 0.5rem;
+        font-size: 0.7rem; font-weight: 600; color: #a0a0a0; text-transform: uppercase;
+        letter-spacing: 0.08em; margin-bottom: 0.5rem;
     }
     .element-card {
-        width: 100%; padding: 1.1rem 0.75rem; border-radius: 14px;
-        background: #ffffff; border: 2px solid #e5e5e0; text-align: center;
-        font-size: 0.95rem; font-weight: 500; color: #1a1a1a; line-height: 1.4;
-        min-height: 72px; display: flex; align-items: center; justify-content: center;
-        transition: all 0.2s ease; cursor: pointer; position: relative;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        width: 100%; padding: 1.25rem 0.65rem; border-radius: 16px;
+        background: #ffffff; border: 2px solid #ecece5; text-align: center;
+        font-size: 0.92rem; font-weight: 500; color: #1a1a1a; line-height: 1.4;
+        min-height: 80px; display: flex; align-items: center; justify-content: center;
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        position: relative;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02);
     }
-    .element-card:hover { border-color: #d0d0cb; transform: translateY(-1px); }
-    .element-card.flipping { animation: flipIn 0.3s ease; }
+    .element-card:hover {
+        border-color: #d0d0cb;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.07);
+    }
+    .element-card.flipping {
+        animation: cardFlip 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
     .element-card.locked {
-        border-color: #d97757; background: #fdf6f3;
-        box-shadow: 0 0 0 3px rgba(217, 119, 87, 0.10);
+        border-color: #d97757;
+        background: linear-gradient(135deg, #fdf6f3 0%, #fff8f0 100%);
+        box-shadow: 0 0 0 3px rgba(217, 119, 87, 0.12), 0 4px 14px rgba(217, 119, 87, 0.08);
     }
+    .element-card.locked:hover { box-shadow: 0 0 0 3px rgba(217, 119, 87, 0.18), 0 8px 24px rgba(217, 119, 87, 0.10); }
     .element-card .lock-badge {
-        position: absolute; top: -6px; right: -6px; font-size: 0.7rem;
-        background: #d97757; color: white; width: 20px; height: 20px;
+        position: absolute; top: -7px; right: -7px; font-size: 0.65rem;
+        background: #d97757; color: white; width: 22px; height: 22px;
         border-radius: 50%; display: flex; align-items: center; justify-content: center;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+        box-shadow: 0 2px 6px rgba(217, 119, 87, 0.3);
+        animation: lockPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
-    @keyframes flipIn {
-        0% { transform: rotateX(10deg) scale(0.95); opacity: 0.5; }
+    .element-card .flip-arrow {
+        position: absolute; bottom: 4px; right: 8px;
+        font-size: 0.6rem; color: #d0d0cb;
+        opacity: 0; transition: opacity 0.2s ease;
+    }
+    .element-card:hover .flip-arrow { opacity: 1; }
+
+    @keyframes cardFlip {
+        0% { transform: rotateX(-8deg) scale(0.92); opacity: 0.3; }
+        50% { transform: rotateX(4deg) scale(1.02); opacity: 0.9; }
         100% { transform: rotateX(0) scale(1); opacity: 1; }
     }
-
-    .book-actions {
-        display: flex; justify-content: center; gap: 0.75rem;
-        margin: 1.5rem auto; max-width: 400px;
+    @keyframes lockPop {
+        0% { transform: scale(0); }
+        70% { transform: scale(1.25); }
+        100% { transform: scale(1); }
     }
+
+    .lock-btn button {
+        font-size: 0.75rem !important;
+        padding: 0.25rem 0.75rem !important;
+        border-radius: 100px !important;
+        margin-top: 0.3rem !important;
+        min-height: 0 !important;
+        line-height: 1.4 !important;
+    }
+
+    .book-actions { display: flex; justify-content: center; gap: 0.75rem; margin: 1.25rem auto; max-width: 400px; }
 
     /* ─── 灵感预览条 ─── */
     .inspiration-preview {
         max-width: 680px; margin: 1.25rem auto 0 auto;
-        padding: 1rem 1.25rem; background: linear-gradient(135deg, #fdf6f3, #fff8f0);
-        border-radius: 14px; border: 1.5px solid #f0e0d8;
+        padding: 1rem 1.25rem;
+        background: linear-gradient(135deg, #fdf6f3, #fff8f0);
+        border-radius: 14px;
+        border: 1.5px solid #f0e0d8;
         text-align: center;
+        position: relative;
+        overflow: hidden;
     }
-    .inspiration-preview .label { font-size: 0.75rem; color: #d97757; font-weight: 600; letter-spacing: 0.03em; margin-bottom: 0.3rem; }
-    .inspiration-preview .sentence { font-size: 1rem; font-weight: 500; color: #1a1a1a; line-height: 1.5; }
+    .inspiration-preview::before {
+        content: ''; position: absolute; inset: 0;
+        background: linear-gradient(90deg, transparent, rgba(217,119,87,0.04), transparent);
+        animation: shimmer 2.5s ease-in-out infinite;
+    }
+    @keyframes shimmer {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+    }
+    .inspiration-preview .label { font-size: 0.75rem; color: #d97757; font-weight: 600; letter-spacing: 0.03em; margin-bottom: 0.3rem; position: relative; z-index: 1; }
+    .inspiration-preview .sentence { font-size: 1rem; font-weight: 500; color: #1a1a1a; line-height: 1.5; position: relative; z-index: 1; }
 
     /* ─── 聊天气泡 ─── */
     .chat-container { display: flex; flex-direction: column; gap: 0.75rem; margin: 1rem 0; }
@@ -435,22 +563,57 @@ st.markdown("""
 
     /* ─── 输入框 ─── */
     .stTextInput > label { display: none !important; }
-    .stTextInput > div > div > input { border: 1px solid #e0e0db; border-radius: 10px; padding: 0.75rem 1rem; font-size: 0.95rem; background: #ffffff; transition: border-color 0.2s, box-shadow 0.2s; }
-    .stTextInput > div > div > input:focus { border-color: #d97757; box-shadow: 0 0 0 3px rgba(217, 119, 87, 0.12); }
-    div[data-testid="stForm"] .stTextInput > div > div > input { border-radius: 8px; padding: 0.6rem 0.85rem; font-size: 0.9rem; }
+    .stTextInput > div > div > input {
+        border: 1px solid #e0e0db; border-radius: 12px;
+        padding: 0.75rem 1rem; font-size: 0.95rem; background: #ffffff;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    }
+    .stTextInput > div > div > input:focus {
+        border-color: #d97757;
+        box-shadow: 0 0 0 3px rgba(217, 119, 87, 0.12), 0 2px 6px rgba(0,0,0,0.02);
+    }
+    div[data-testid="stForm"] .stTextInput > div > div > input { border-radius: 10px; padding: 0.6rem 0.85rem; font-size: 0.9rem; }
 
     /* ─── 按钮 ─── */
-    div.stButton button { border-radius: 100px !important; border: 1.5px solid #e0e0db !important; background: #ffffff !important; color: #1a1a1a !important; font-size: 0.9rem !important; font-weight: 500 !important; padding: 0.6rem 1.25rem !important; width: 100%; transition: all 0.15s ease; box-shadow: none !important; }
-    div.stButton button:hover { border-color: #d97757 !important; background: #fdf6f3 !important; color: #d97757 !important; box-shadow: 0 2px 8px rgba(217, 119, 87, 0.10) !important; }
-    div.stButton button:active { transform: scale(0.97); }
+    div.stButton button {
+        border-radius: 100px !important;
+        border: 1.5px solid #e0e0db !important;
+        background: #ffffff !important;
+        color: #1a1a1a !important;
+        font-size: 0.9rem !important;
+        font-weight: 500 !important;
+        padding: 0.6rem 1.25rem !important;
+        width: 100%;
+        transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.02) !important;
+    }
+    div.stButton button:hover {
+        border-color: #d97757 !important;
+        background: #fdf6f3 !important;
+        color: #d97757 !important;
+        box-shadow: 0 4px 12px rgba(217, 119, 87, 0.10) !important;
+        transform: translateY(-1px);
+    }
+    div.stButton button:active { transform: scale(0.96) !important; }
+    div.stButton button p { font-weight: 500; }
 
-    /* ─── 进度 ─── */
+    /* ─── 进度条 ─── */
     .stProgress > div > div > div > div { background: linear-gradient(90deg, #d97757, #f5a623); border-radius: 100px; }
     .stProgress > div > div { background: #e5e5e0; border-radius: 100px; height: 6px; }
-    .question-header { font-size: 1.15rem; font-weight: 600; color: #1a1a1a; line-height: 1.5; margin: 1.25rem 0 0.75rem 0; padding: 1rem 1.25rem; background: #ffffff; border-radius: 12px; border: 1px solid #e5e5e0; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+    .question-header { font-size: 1.15rem; font-weight: 600; color: #1a1a1a; line-height: 1.5; margin: 1.25rem 0 0.75rem 0; padding: 1rem 1.25rem; background: #ffffff; border-radius: 12px; border: 1px solid #e5e5e0; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
     .stSpinner > div { color: #d97757 !important; }
     .streamlit-expanderHeader { font-size: 0.85rem; color: #6b6b6b; font-weight: 500; border-radius: 8px; }
-    .result-card { background: #ffffff; border: 1px solid #e5e5e0; border-radius: 14px; padding: 1.5rem 1.75rem; margin: 1rem 0; box-shadow: 0 2px 8px rgba(0,0,0,0.04); line-height: 1.8; font-size: 0.95rem; color: #2a2a2a; }
+
+    /* ─── 结果卡片 ─── */
+    .result-card {
+        background: #ffffff; border: 1px solid #e5e5e0; border-radius: 16px;
+        padding: 1.5rem 1.75rem; margin: 1rem 0;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02);
+        line-height: 1.8; font-size: 0.95rem; color: #2a2a2a;
+        position: relative;
+    }
+
     .stage-tag { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.78rem; font-weight: 500; color: #d97757; background: #fdf6f3; padding: 0.25rem 0.7rem; border-radius: 100px; margin-top: 1rem; }
     .stAlert { border-radius: 10px; }
     #MainMenu {visibility: hidden;}
@@ -460,7 +623,6 @@ st.markdown("""
     .dim-pill.active { border-color: #d97757; background: #fdf6f3; color: #d97757; }
     .dim-pill.done { border-color: #b8d4b8; background: #f0f7f0; color: #4a8a4a; }
 
-    /* rides header color accent */
     .ride-color-bar { height: 3px; border-radius: 2px; margin: 0.5rem auto; width: 40px; }
 </style>
 """, unsafe_allow_html=True)
@@ -570,8 +732,6 @@ elif st.session_state.stage == "playground":
         cols = st.columns(2)
         for col_idx, ride in enumerate(row_rides):
             with cols[col_idx]:
-                btn_label = f"{ride['emoji']}  {ride['name']}\n{ride['vibe']}\n{ride['desc']}"
-                # 每个项目按钮显示 emoji + 名称 + 风格
                 if st.button(
                     f"{ride['emoji']}  {ride['name']}",
                     key=f"ride_{ride['id']}",
@@ -584,7 +744,6 @@ elif st.session_state.stage == "playground":
                     st.session_state.current_elements = elems
                     st.session_state.stage = "ride_play"
                     st.rerun()
-                # 子描述文字
                 st.caption(f"{ride['vibe']} · {ride['desc']}")
 
 # ══════════════════════════════════════
@@ -603,13 +762,12 @@ elif st.session_state.stage == "ride_play":
     locked = st.session_state.get("locked_elements", {})
     categories = ["角色", "动作", "场景"]
 
-    # 书头
     st.markdown(f"""
     <div class="book-header">
         <h2>{ride['emoji']} {ride['name']}</h2>
-        <p style="color:{ride['color']}">{ride['vibe']}</p>
-        <div class="ride-color-bar" style="background:{ride['color']}"></div>
-        <p style="font-size:0.85rem; color:#8b8b8b;">点击元素卡片锁定它，再翻页就不会变了</p>
+        <div class="book-subtitle" style="color:{ride['color']}">{ride['vibe']}</div>
+        <div class="book-divider" style="background:{ride['color']}"></div>
+        <div class="book-subtitle">点击 🔒 锁定喜欢的元素，再翻页就不会变了</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -625,7 +783,8 @@ elif st.session_state.stage == "ride_play":
             flip_class = " flipping" if st.session_state.get("_just_flipped", False) else ""
             st.markdown(
                 f'<div class="element-card {lock_class}{flip_class}" id="card_{cat}">'
-                f'{lock_badge}<span>{val}</span></div>',
+                f'{lock_badge}<span>{val}</span>'
+                f'<div class="flip-arrow">⟳</div></div>',
                 unsafe_allow_html=True
             )
             # 锁定/解锁小按钮
