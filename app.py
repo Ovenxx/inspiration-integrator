@@ -314,8 +314,7 @@ def synthesize(角色, 动作, 场景):
 # ───────────────────────────────────────
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap');
-    html, body, [class*="css"] { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    html, body, [class*="css"] { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
 
     /* ─── 背景层 ─── */
     .stApp {
@@ -334,13 +333,13 @@ st.markdown("""
     }
     .stApp::before {
         width: 500px; height: 500px;
-        background: radial-gradient(circle, #f5a62315 0%, transparent 70%);
+        background: radial-gradient(circle, rgba(245, 166, 35, 0.08) 0%, transparent 70%);
         top: -150px; right: -150px;
         animation: floatGlow 12s ease-in-out infinite alternate;
     }
     .stApp::after {
         width: 400px; height: 400px;
-        background: radial-gradient(circle, #d9775715 0%, transparent 70%);
+        background: radial-gradient(circle, rgba(217, 119, 87, 0.08) 0%, transparent 70%);
         bottom: -100px; left: -100px;
         animation: floatGlow 15s ease-in-out infinite alternate-reverse;
     }
@@ -381,7 +380,7 @@ st.markdown("""
     }
     .mode-card::after {
         content: ''; position: absolute; inset: 0;
-        background: linear-gradient(135deg, transparent 60%, #fdf6f360 100%);
+        background: linear-gradient(135deg, transparent 60%, rgba(253, 246, 243, 0.38) 100%);
         opacity: 0; transition: opacity 0.3s ease;
     }
     .mode-card:hover { transform: translateY(-4px) scale(1.01); box-shadow: 0 12px 32px rgba(0,0,0,0.08); border-color: #d0d0cb; }
@@ -419,7 +418,7 @@ st.markdown("""
     }
     .ride-btn button::before {
         content: ''; position: absolute; inset: 0;
-        background: linear-gradient(135deg, transparent 50%, #fdf6f360 100%);
+        background: linear-gradient(135deg, transparent 50%, rgba(253, 246, 243, 0.38) 100%);
         opacity: 0; transition: opacity 0.3s ease;
     }
     .ride-btn button:hover {
