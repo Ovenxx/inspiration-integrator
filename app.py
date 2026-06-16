@@ -368,7 +368,7 @@ footer { visibility: hidden; }
 .dim-pill.active { border-color: #d97757; background: #fdf6f3; color: #d97757; }
 .dim-pill.done { border-color: #b8d4b8; background: #f0f7f0; color: #4a8a4a; }
 .ride-color-bar { height: 3px; border-radius: 2px; margin: 0.5rem auto; width: 40px; }
-</style></style>""", unsafe_allow_html=True)
+</style>""", unsafe_allow_html=True)
 
 # ===== 初始化状态 =====
 if "messages" not in st.session_state:
