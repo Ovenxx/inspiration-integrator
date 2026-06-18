@@ -216,6 +216,30 @@ STORY_SYSTEM_PROMPT = """你是一个专写"刷着爽"的微小说作家。
 def quick_synthesize(role, action, target, scene):
     return f"{role} · {action} · {target} · {scene}"
 
+def get_available_combos(ride_id, locked=None):
+    ride = next(r for r in RIDES if r["id"] == ride_id)
+    used = st.session_state.get("used_combos", set())
+    combos = [c for i, c in enumerate(ride["combinations"]) if i not in used]
+    if not combos:
+        st.session_state.used_combos = set()
+        combos = list(ride["combinations"])
+    if locked:
+        locked_cats = {k for k, v in locked.items() if v}
+        def match_score(combo):
+            return sum(1 for k in locked_cats if combo.get(k) == locked[k])
+        combos.sort(key=match_score, reverse=True)
+    return combos
+
+def pick_combo(ride_id, locked=None):
+    combos = get_available_combos(ride_id, locked)
+    best = combos[0]
+    ride = next(r for r in RIDES if r["id"] == ride_id)
+    idx = ride["combinations"].index(best)
+    used = st.session_state.get("used_combos", set())
+    used.add(idx)
+    st.session_state.used_combos = used
+    return best
+
 def generate_story(role, action, target, scene, length="标准"):
     """调用 DeepSeek 生成微小说"""
     length_map = {"短篇": "300 字左右", "标准": "500 字左右", "长篇": "800 字左右"}
@@ -234,6 +258,58 @@ def generate_story(role, action, target, scene, length="标准"):
         return resp.choices[0].message.content.strip()
     except Exception:
         return None
+
+
+def extract_json(raw):
+    decoder = json.JSONDecoder()
+    match = re.search(r'```(?:json)?\s*?\n?(.*?)```', raw, re.DOTALL)
+    if match:
+        candidate = match.group(1).strip()
+        try:
+            json.loads(candidate)
+            return candidate
+        except json.JSONDecodeError:
+            pass
+    for ch in ('{', '['):
+        pos = 0
+        while True:
+            start = raw.find(ch, pos)
+            if start == -1:
+                break
+            try:
+                obj, end = decoder.raw_decode(raw, start)
+                return raw[start:end]
+            except json.JSONDecodeError:
+                pos = start + 1
+                continue
+    raise ValueError(f'JSON extract failed: {raw[:200]}')
+
+def call_deepseek(messages, model="deepseek-chat", temperature=0.8, max_tokens=1200):
+    response = client.chat.completions.create(
+        model=model, messages=messages,
+        temperature=temperature, max_tokens=max_tokens
+    )
+    raw = response.choices[0].message.content
+    st.session_state['_last_raw_response'] = raw
+    return json.loads(extract_json(raw))
+
+def build_progress_context():
+    covered = st.session_state.get('covered_dimensions', [])
+    remaining = [d for d in DIMENSIONS if d not in covered]
+    if not covered:
+        return '这是第一轮，请从第一个维度开始提问。'
+    lines = ['当前进度：']
+    for d in DIMENSIONS:
+        if d in covered:
+            lines.append(f'  OK {d} -- 已完成')
+        else:
+            lines.append(f'  .. {d} -- 待讨论')
+    if remaining:
+        lines.append(f'接下来请问：{remaining[0]}')
+    else:
+        lines.append('所有维度已覆盖，请finish=true')
+    return '\n'.join(lines)
+
 
 
 # ───────────────────────────────────────
