@@ -259,6 +259,25 @@ def generate_story(role, action, target, scene, length="标准"):
     except Exception:
         return None
 
+def generate_story_from_idea(idea, length="标准"):
+    """直接用用户输入的灵感生成微小说"""
+    length_map = {"短篇": "300 字左右", "标准": "500 字左右", "长篇": "800 字左右"}
+    target_len = length_map.get(length, "500 字左右")
+    prompt = f"用户灵感：{idea}\n\n请根据这个灵感写一篇{target_len}的微小说："
+    try:
+        resp = client.chat.completions.create(
+            model="deepseek-chat",
+            messages=[
+                {"role": "system", "content": STORY_SYSTEM_PROMPT},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.7,
+            max_tokens=1500
+        )
+        return resp.choices[0].message.content.strip()
+    except Exception:
+        return None
+
 
 def extract_json(raw):
     decoder = json.JSONDecoder()
@@ -341,10 +360,13 @@ if "flip_count" not in st.session_state:
 
 # ===== 页面头部 =====
 st.markdown("""
-<div class="app-header">
-    <h1>Inspiration Integrator</h1>
-    <div class="accent-line"></div>
-    <div class="subtitle">把你的灵感，变成刷着停不下来的微小说</div>
+<div style="text-align:center; padding: 0.5rem 0 0.5rem 0;">
+    <div style="font-size: 3rem; font-weight: 300; color: #1a1a2e; letter-spacing: 0.05em; line-height: 1.2;">
+        回归文字本身的浏览
+    </div>
+    <div style="font-size: 0.85rem; color: #8888a0; margin-top: 0.25rem; font-weight: 400;">
+        微小说AI工具
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -352,57 +374,51 @@ st.markdown("""
 #  HOME — 双模式入口
 # ══════════════════════════════════════
 if st.session_state.stage == "home":
-    st.markdown("""
-    <div class="home-tagline">
-        你有一个想做的视频，但不知道从哪开始？<br>
-        或者只是想随便逛逛，等灵感自己撞上来？
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown('<div style="height: 1rem;"></div>', unsafe_allow_html=True)
 
     col1, col2 = st.columns(2)
     with col1:
-        st.markdown("""
-        <div class="mode-card" id="mode-hasidea">
-            <div class="icon">✍️</div>
-            <div class="title">我有想法</div>
-            <div class="desc">脑海里已经有故事了<br>让 AI 帮你写出来</div>
-        </div>
-        """, unsafe_allow_html=True)
         if st.button("✍️ 我有想法", key="btn_has_idea", use_container_width=True):
             st.session_state.stage = "has_idea"
             st.rerun()
 
     with col2:
-        st.markdown("""
-        <div class="mode-card" id="mode-playground">
-            <div class="icon">🎪</div>
-            <div class="title">来找灵感</div>
-            <div class="desc">不知道写什么？选个题材玩一玩</div>
-        </div>
-        """, unsafe_allow_html=True)
         if st.button("🎪 来找灵感", key="btn_playground", use_container_width=True):
             st.session_state.stage = "playground"
             st.rerun()
 
+    st.markdown('<div style="height: 2rem;"></div>', unsafe_allow_html=True)
+
 # ══════════════════════════════════════
-#  HAS IDEA — 直接输入
+#  HAS IDEA — 直接输入 → 生成微小说
 # ══════════════════════════════════════
 elif st.session_state.stage == "has_idea":
     if st.button("← 返回首页", key="back_home_1"):
         st.session_state.clear()
         st.rerun()
 
-    st.markdown('<div style="text-align:center; color:#6b6b6b; font-size:0.9rem; margin:1rem 0;">输入一个简单的想法，AI 会帮你一步步完善</div>', unsafe_allow_html=True)
+    st.markdown('<div style="text-align:center; color:#8888a0; font-size:0.85rem; margin:1rem 0;">输入一个灵感，AI 直接帮你写成一篇微小说</div>', unsafe_allow_html=True)
 
-    user_seed = st.text_input(
-        "谁，在哪，干什么？",
-        placeholder="例如：C罗来内马尔家里跳东北大秧歌",
-        label_visibility="collapsed"
-    )
-    if user_seed:
-        st.session_state.messages.append({"role": "user", "content": user_seed})
-        st.session_state.stage = "choosing"
-        st.rerun()
+    with st.form("idea_form"):
+        user_seed = st.text_input(
+            "你的灵感",
+            placeholder="例如：一个关于失忆的故事",
+            label_visibility="collapsed"
+        )
+        submitted = st.form_submit_button("✍️ 生成故事", use_container_width=True)
+
+    if submitted and user_seed:
+        with st.spinner("正在创作故事..."):
+            story = generate_story_from_idea(user_seed)
+        if story:
+            # 用一个默认的"原创灵感" ride 来展示结果
+            ride = {"emoji": "✍️", "name": "原创灵感", "color": "#7c3aed"}
+            st.session_state.stage = "ride_complete"
+            st.session_state.final_story = story
+            st.session_state.final_story_ride = ride
+            st.rerun()
+        else:
+            st.error("故事生成失败了，请重试")
 
 # ══════════════════════════════════════
 #  PLAYGROUND — 选项目
