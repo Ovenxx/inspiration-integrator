@@ -574,10 +574,10 @@ elif st.session_state.stage == "ride_complete":
     para_html = ''.join(f'<p>{p}</p>' for p in paragraphs if p.strip())
     st.markdown(f'<div class="result-card">{para_html}</div>', unsafe_allow_html=True)
 
-    # 复制按钮
-    st.code(story_text, language="markdown")
-
-    st.divider()
+    # 复制全文按钮
+    _, col_copy, _ = st.columns([1.5, 1, 1.5])
+    with col_copy:
+        st.download_button("📋 复制全文", data=story_text, file_name="story.txt", mime="text/plain", use_container_width=True)
 
     col_video, col_again = st.columns([1, 1])
     with col_video:
