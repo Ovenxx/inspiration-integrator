@@ -268,6 +268,26 @@ RIDES = [
     },
 ]
 
+SYNTHESIS_PROMPT = """你是一个中文造句助手。用户会给你四个词：角色、动作、承受者、场景。
+请把它们组合成一句通顺、自然、有画面感的中文句子，作为视频创意的种子。
+要求：
+- 句子必须包含所有四个元素
+- 语法正确，符合中文表达习惯
+- 适当添加"在""了""着""把""被"等虚词使句子流畅
+- 不要添加四个元素之外的新内容
+- 只输出句子本身，不要解释、不要引号
+
+示例：
+角色：失忆特工　动作：追查　承受者：失踪的搭档　场景：雨夜码头
+→ 失忆特工在雨夜码头追查失踪的搭档
+
+角色：小蘑菇精灵　动作：缝制　承受者：彩虹披风　场景：星光下的森林
+→ 小蘑菇精灵在星光下的森林里缝制彩虹披风
+
+角色：便利店大叔　动作：在雨中等　承受者：一封没有寄出的信　场景：深夜便利店
+→ 便利店大叔在深夜便利店的雨中，等着寄出一封没有寄出的信
+"""
+
 def extract_json(raw: str) -> str:
     decoder = json.JSONDecoder()
     match = re.search(r'```(?:json)?\s*\n?(.*?)```', raw, re.DOTALL)
@@ -330,14 +350,27 @@ def random_elements(ride_id):
         "场景": random.choice(ride["场景"]),
     }
 
+def quick_synthesize(角色, 动作, 承受者, 场景):
+    """快速拼接预览（不做API调用）"""
+    return f"{角色} · {动作} · {承受者} · {场景}"
+
 def synthesize(角色, 动作, 承受者, 场景):
-    """把四个元素合成一句话灵感"""
-    templates = [
-        f"{角色}在{场景}{动作}{承受者}",
-        f"{角色}{动作}{承受者}，在{场景}",
-        f"在{场景}，{角色}{动作}{承受者}",
-    ]
-    return random.choice(templates)
+    """用 DeepSeek 把四个元素合成通顺的中文句子"""
+    prompt = f"角色：{角色}\n动作：{动作}\n承受者：{承受者}\n场景：{场景}\n\n请合成一句通顺自然的句子："
+    try:
+        response = client.chat.completions.create(
+            model="deepseek-chat",
+            messages=[
+                {"role": "system", "content": SYNTHESIS_PROMPT},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.5,
+            max_tokens=200
+        )
+        return response.choices[0].message.content.strip()
+    except Exception:
+        # API 失败时降级为简单拼接
+        return f"{角色}在{场景}{动作}{承受者}"
 
 # ───────────────────────────────────────
 # 页面样式
@@ -708,20 +741,22 @@ elif st.session_state.stage == "ride_play":
             st.rerun()
 
     with col_b:
-        # 合成灵感预览
-        sentence = synthesize(elems["角色"], elems["动作"], elems["承受者"], elems["场景"])
-        st.session_state["_sentence"] = sentence
+        # 合成灵感（实时预览用快速拼接，按按钮时才调 AI 润色）
+        preview = quick_synthesize(elems["角色"], elems["动作"], elems["承受者"], elems["场景"])
+        st.session_state["_sentence_preview"] = preview
         if st.button("✨ 合成灵感", key="synthesize", use_container_width=True):
+            with st.spinner("正在润色句子..."):
+                sentence = synthesize(elems["角色"], elems["动作"], elems["承受者"], elems["场景"])
             st.session_state.stage = "ride_complete"
             st.session_state.final_inspiration = sentence
             st.session_state.final_inspiration_ride = ride
             st.rerun()
 
-    # 当前合成预览
+    # 当前组合预览
     st.markdown(f"""
     <div class="inspiration-preview">
         <div class="label">当前组合</div>
-        <div class="sentence">{sentence}</div>
+        <div class="sentence">{preview}</div>
     </div>
     """, unsafe_allow_html=True)
 
