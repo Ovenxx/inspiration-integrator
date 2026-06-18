@@ -574,6 +574,9 @@ elif st.session_state.stage == "ride_complete":
     para_html = ''.join(f'<p>{p}</p>' for p in paragraphs if p.strip())
     st.markdown(f'<div class="result-card">{para_html}</div>', unsafe_allow_html=True)
 
+    # 复制按钮
+    st.code(story_text, language="markdown")
+
     st.divider()
 
     col_video, col_again = st.columns([1, 1])
