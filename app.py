@@ -315,11 +315,7 @@ def synthesize(角色, 动作, 场景):
 st.markdown("""
 <style>
     html, body, [class*="css"] { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-    .stApp { background: #f5f5f0; position: relative; overflow-x: hidden; }
-    .stApp::before, .stApp::after { content: ''; position: fixed; border-radius: 50%; pointer-events: none; z-index: 0; opacity: 0.25; }
-    .stApp::before { width: 500px; height: 500px; background: radial-gradient(circle, rgba(245, 166, 35, 0.06) 0%, transparent 70%); top: -150px; right: -150px; animation: floatGlow 12s ease-in-out infinite alternate; }
-    .stApp::after { width: 400px; height: 400px; background: radial-gradient(circle, rgba(217, 119, 87, 0.06) 0%, transparent 70%); bottom: -100px; left: -100px; animation: floatGlow 15s ease-in-out infinite alternate-reverse; }
-    @keyframes floatGlow { 0% { transform: translate(0, 0) scale(1); opacity: 0.2; } 100% { transform: translate(30px, -20px) scale(1.15); opacity: 0.35; } }
+    .stApp { background: linear-gradient(120deg, #f5f5f0 0%, #faf6f2 100%); }
     .main .block-container { max-width: 800px; padding-top: 2rem; padding-bottom: 4rem; }
     .app-header { text-align: center; padding-bottom: 2rem; margin-bottom: 1.5rem; border-bottom: 1px solid #e5e5e0; }
     .app-header h1 { font-size: 1.75rem; font-weight: 600; letter-spacing: -0.02em; color: #1a1a1a; margin-bottom: 0.25rem; }
