@@ -360,11 +360,14 @@ if "flip_count" not in st.session_state:
 
 # ===== 页面头部 =====
 st.markdown("""
-<div style="text-align:center; padding: 0.5rem 0 0.5rem 0;">
-    <div style="font-size: 3rem; font-weight: 300; color: #1a1a2e; letter-spacing: 0.05em; line-height: 1.2;">
+<div style="text-align:center; padding: 0.8rem 0 0.5rem 0;">
+    <div style="font-size: 2.8rem; font-weight: 700; color: #a78bfa; letter-spacing: -0.02em; line-height: 1.2;">
+        Inspirator
+    </div>
+    <div style="font-size: 1.1rem; font-weight: 400; color: #1a1a2e; margin-top: 0.3rem;">
         回归文字本身的浏览
     </div>
-    <div style="font-size: 0.85rem; color: #8888a0; margin-top: 0.25rem; font-weight: 400;">
+    <div style="font-size: 0.8rem; color: #8888a0; margin-top: 0.2rem; font-weight: 400;">
         微小说AI工具
     </div>
 </div>
