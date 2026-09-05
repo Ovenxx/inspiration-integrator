@@ -1,4 +1,4 @@
-# Multi-Consensus Based Estimation of Distribution Algorithm with Domain Knowledge for Multi-Objective Green Vehicle Routing
+# Micro-fiction AI tool that goes back to the simple pleasure of words
 
 Turn a vague spark of inspiration into a polished micro-story, and then into a ready-to-use AI video prompt.
 
