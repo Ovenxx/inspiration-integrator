@@ -1,4 +1,4 @@
-# Inspirator — Inspiration Integrator
+# Multi-Consensus Based Estimation of Distribution Algorithm with Domain Knowledge for Multi-Objective Green Vehicle Routing
 
 Turn a vague spark of inspiration into a polished micro-story, and then into a ready-to-use AI video prompt.
 
